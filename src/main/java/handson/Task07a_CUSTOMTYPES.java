@@ -66,13 +66,31 @@ public class Task07a_CUSTOMTYPES {
 
         Map<String, String> namesForType = new HashMap<String, String>() {
             {
-                put("DE", "mh-Block-Customer");
-                put("EN", "mh-Block-Customer");
+                put("DE", "mcz-Block-Customer");
+                put("EN", "mcz-Block-Customer");
             }
         };
 
         logger.info("Custom Type info: " +
-                " "
+                " " + client
+                .types()
+                .post(
+                        TypeDraftBuilder.of()
+                                .key("mcz-custom-type")
+                                .name(
+                                        LocalizedStringBuilder.of()
+                                                .values(namesForType)
+                                                .build()
+                                )
+                                .resourceTypeIds(ResourceTypeId.CUSTOMER)
+                                .fieldDefinitions(definitions)
+                                .build()
+                )
+                .execute()
+                .toCompletableFuture()
+                .get()
+                .getBody()
+                .getId()
         );
 
         client.close();

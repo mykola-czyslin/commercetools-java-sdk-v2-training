@@ -49,7 +49,7 @@ public class Task07b_CUSTOMOBJECTS {
                         .post(
                                 CustomObjectDraftBuilder.of()
                                         .container("plants-compatibility-info")
-                                        .key("tulip-seed-product")
+                                        .key("mcz-tulip-seed-product")
                                         .value(
                                                 new ObjectMapper()
                                                         .readTree(tulipObject.toString()))

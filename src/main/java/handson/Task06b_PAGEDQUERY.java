@@ -25,6 +25,16 @@ public class Task06b_PAGEDQUERY {
 
         Logger logger = LoggerFactory.getLogger(Task06b_PAGEDQUERY.class.getName());
 
+        client
+//                .withProjectKey(projectKey)
+                .productProjections()
+                .search()
+                .get()
+                .withStaged(false)
+                .withMarkMatchingVariants(true)
+                .executeBlocking()
+                .getBody();
+
         // UseCases
         // Fetching ALL products
         // Fetching ALL products of a certain type
@@ -52,7 +62,7 @@ public class Task06b_PAGEDQUERY {
 
         String productTypeId = client
                 .productTypes()
-                .withKey("plant-seeds-product-type")
+                .withKey("flower-type")
                 .get()
                 .execute()
                 .toCompletableFuture().get()

@@ -1,6 +1,7 @@
 package handson.impl;
 
 import com.commercetools.api.client.ProjectApiRoot;
+import com.commercetools.api.models.common.LocalizedString;
 import com.commercetools.api.models.common.LocalizedStringBuilder;
 import com.commercetools.api.models.product.ProductResourceIdentifierBuilder;
 import com.commercetools.api.models.product_selection.*;
@@ -60,7 +61,21 @@ public class ProductSelectionService {
      */
     public CompletableFuture<ApiHttpResponse<ProductSelection>> createProductSelection(final String productSelectionKey, final String name) {
         return
-                null;
+                apiRoot
+                        .productSelections()
+                        .post(
+                                ProductSelectionDraftBuilder.of()
+                                        .key(productSelectionKey)
+                                        .name(
+                                                LocalizedStringBuilder.of()
+                                                        .addValue("en", name)
+                                                        .addValue("de", name)
+                                                        .addValue("uk", name)
+                                                        .build()
+                                        )
+                                        .build()
+                        )
+                        .execute();
     }
 
 
@@ -68,8 +83,27 @@ public class ProductSelectionService {
             final ApiHttpResponse<ProductSelection> productSelectionApiHttpResponse,
             final String productKey) {
 
+        final ProductSelection selection = productSelectionApiHttpResponse.getBody();
+
         return
-                null;
+                apiRoot
+                        .productSelections()
+                        .withId(selection.getId())
+                        .post(
+                                ProductSelectionUpdateBuilder.of()
+                                        .version(selection.getVersion())
+                                        .actions(
+                                                ProductSelectionAddProductActionBuilder.of()
+                                                        .product(
+                                                                ProductResourceIdentifierBuilder.of()
+                                                                        .key(productKey)
+                                                                        .build()
+                                                        )
+                                                        .build()
+                                        )
+                                        .build()
+                        )
+                        .execute();
     }
 
     public CompletableFuture<ApiHttpResponse<Store>> addProductSelectionToStore(

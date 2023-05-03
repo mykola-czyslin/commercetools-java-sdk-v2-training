@@ -2,9 +2,11 @@ package handson;
 
 import com.commercetools.api.client.ProjectApiRoot;
 import com.commercetools.api.models.cart.Cart;
+import com.commercetools.api.models.cart.CartPagedQueryResponse;
 import com.commercetools.api.models.cart.CartResourceIdentifierBuilder;
 import com.commercetools.api.models.customer.CustomerSigninBuilder;
 import handson.impl.*;
+import io.vrap.rmf.base.client.ApiHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,7 @@ public class Task04c_CART_MERGING {
 
         // Get a customer and create a cart for this customer
         //
-        final Cart cart = customerService.getCustomerByKey("customer-michael15")
+        final Cart cart = customerService.getCustomerByKey("mykola-czyslin")
                 .thenComposeAsync(cartService::createCart)
                 .toCompletableFuture().get()
                 .getBody();
@@ -54,8 +56,8 @@ public class Task04c_CART_MERGING {
                 .post(
                         CustomerSigninBuilder.of()
                                 .anonymousCartSignInMode(MERGE_WITH_EXISTING_CUSTOMER_CART) // Switch to USE_AS_NEW_ACTIVE_CUSTOMER_CART and notice the difference
-                                .email("michael15@example.com")
-                                .password("password")
+                                .email("mykola_czyslin@epam.com")
+                                .password("__aaaBbbbcCccccD")
                                 .anonymousCart(CartResourceIdentifierBuilder.of()
                                         .id(anonymousCart.getId())
                                         .build())
@@ -67,6 +69,29 @@ public class Task04c_CART_MERGING {
 
         // TODO: Inspect the customers carts here or via impex
         //
+
+        for (int offset = 0; ; ) {
+            CartPagedQueryResponse pageResponse = client
+                    .carts()
+                    .get(
+
+                    )
+                    .withWhere("customerId=\"" + cart.getCustomerId() + "\"")
+                    .withLimit(100)
+                    .withOffset(offset)
+                    .withSort("id")
+                    .execute()
+                    .toCompletableFuture()
+                    .get()
+                    .getBody();
+            logger.info("Count: {}, Total: {}; Limit: {}", pageResponse.getCount(), pageResponse.getTotal(), pageResponse.getLimit());
+            pageResponse.getResults().forEach(crt -> System.out.printf("Cart Id: %1$s%n", crt.getId()));
+            if (pageResponse.getCount() < pageResponse.getLimit()) {
+                break;
+            }
+            offset+= 100;
+        }
+
 
         client.close();
     }

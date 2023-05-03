@@ -26,12 +26,16 @@ public class Task07c_APIEXTENSION {
                         .extensions()
                         .post(
                                 ExtensionDraftBuilder.of()
-                                        .key("mhCustomerBlocker")
+                                        .key("mczCustomerBlocker")
                                         .destination(
-                                                // for GCP Cloud functions
+                                                // Webhook endpoint
                                                 ExtensionHttpDestinationBuilder.of()
-                                                        .url("https://europe-west3-ct-support.cloudfunctions.net/training-extensions-sample")
+                                                        .url("https://webhook.site/a719ac30-11c5-4619-837e-24dd689308a7")
                                                         .build()
+                                                // for GCP Cloud functions
+//                                                ExtensionHttpDestinationBuilder.of()
+//                                                        .url("https://europe-west3-ct-support.cloudfunctions.net/training-extensions-sample")
+//                                                        .build()
                                                 //for AWS Lambda functions
 //                                                ExtensionAWSLambdaDestinationBuilder.of()
 //                                                        .arn("arn:aws:lambda:eu-central-1:923270384842:function:training-customer-check")

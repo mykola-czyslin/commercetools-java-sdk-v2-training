@@ -32,7 +32,7 @@ public class Task08a_SUBSCRIPTION {
                         .subscriptions()
                         .post(
                                 SubscriptionDraftBuilder.of()
-                                        .key("mhOrderPlacedSubscription")
+                                        .key("mczOrderPlacedSubscription")
                                         .destination(
                                                 //for GCP Pub/Sub topic
                                                 GoogleCloudPubSubDestinationBuilder.of()

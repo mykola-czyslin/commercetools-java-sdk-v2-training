@@ -1,9 +1,7 @@
 package handson.impl;
 
 import com.commercetools.importapi.client.ProjectApiRoot;
-import com.commercetools.importapi.models.common.Money;
-import com.commercetools.importapi.models.common.ProductKeyReferenceBuilder;
-import com.commercetools.importapi.models.common.ProductVariantKeyReferenceBuilder;
+import com.commercetools.importapi.models.common.*;
 import com.commercetools.importapi.models.importcontainers.ImportContainer;
 import com.commercetools.importapi.models.importcontainers.ImportContainerDraftBuilder;
 import com.commercetools.importapi.models.importrequests.ImportResponse;
@@ -46,9 +44,33 @@ public class ImportService {
             final String priceKey,
             final Money amount) {
 
+        PriceImportRequest request = PriceImportRequestBuilder.of()
+                .resources(
+                        PriceImportBuilder.of()
+                                .key(priceKey)
+                                .country("UA")
+                                .product(
+                                        ProductKeyReferenceBuilder.of()
+                                                .key(productKey)
+                                                .build()
+                                )
+                                .productVariant(
+                                        ProductVariantKeyReferenceBuilder.of()
+                                                .key(productVariantKey)
+                                                .build()
+                                )
+                                .value(amount)
+                                .build()
+                )
+                .build();
 
             return
-                    null;
+                    apiRoot
+                            .prices()
+                            .importContainers()
+                            .withImportContainerKeyValue(containerKey)
+                            .post(request)
+                            .execute();
     }
 
 

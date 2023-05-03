@@ -4,6 +4,7 @@ import com.commercetools.api.client.ProjectApiRoot;
 import com.commercetools.api.defaultconfig.ServiceRegion;
 import com.commercetools.api.models.graph_ql.GraphQLRequestBuilder;
 import handson.graphql.ProductCustomerQuery;
+import handson.graphql.ProductData;
 import handson.impl.ApiPrefixHelper;
 import io.aexp.nodes.graphql.*;
 import io.vrap.rmf.base.client.AuthenticationToken;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -53,30 +55,50 @@ public class Task06c_GRAPHQL_Nodes {
         // TODO:
         //  Fetch a token, then inspect the following code
         //
-//        final AuthenticationToken authenticationToken = getTokenForClientCredentialsFlow(apiClientPrefix);
-//        logger.info("\nToken fetched : " + authenticationToken.getAccessToken());
-//
-//        Map<String, String> headers = new HashMap<>();
-//        headers.put("Authorization", "Bearer " + authenticationToken.getAccessToken());
-//        // replace in Java 9 with .headers(Map.of("Authorization", "Bearer " + token))
-//
-//        GraphQLResponseEntity<ProductCustomerQuery> responseEntity =
-//                    new GraphQLTemplate()
-//                            .query(
-//                                    GraphQLRequestEntity.Builder()
-//                                            .url(ServiceRegion.GCP_EUROPE_WEST1.getApiUrl() + "/" + projectKey + "/graphql")
-//                                            .headers(headers)
-//                                            .request(ProductCustomerQuery.class)
-//                                            .arguments(new Arguments("products",
-//                                                    new Argument("limit", 2),
-//                                                    new Argument("sort", "masterData.current.name.en desc")
-//                                            ))
-//                                            .build(),
-//                                    ProductCustomerQuery.class
-//                            );
-//        logger.info("Total products: " + responseEntity.getResponse().getProducts().getTotal());
-//        responseEntity.getResponse().getProducts().getResults().forEach(result ->
-//                    logger.info("Id: " + result.getId() + "Name: " + result.getMasterData().getCurrent().getName()));
-//        logger.info("Total customers: " + responseEntity.getResponse().getCustomers().getTotal());
+        final AuthenticationToken authenticationToken = getTokenForClientCredentialsFlow(apiClientPrefix);
+        logger.info("\nToken fetched : " + authenticationToken.getAccessToken());
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + authenticationToken.getAccessToken());
+        // replace in Java 9 with .headers(Map.of("Authorization", "Bearer " + token))
+
+        GraphQLResponseEntity<ProductCustomerQuery> responseEntity =
+                    new GraphQLTemplate()
+                            .query(
+                                    GraphQLRequestEntity.Builder()
+                                            .url(ServiceRegion.GCP_EUROPE_WEST1.getApiUrl() + "/" + projectKey + "/graphql")
+                                            .headers(headers)
+                                            .request(ProductCustomerQuery.class)
+                                            .arguments(new Arguments("products",
+                                                    new Argument("limit", 2),
+                                                    new Argument("sort", "masterData.current.name.en desc")
+                                            ))
+                                            .build(),
+                                    ProductCustomerQuery.class
+                            );
+        logger.info("Total products: " + responseEntity.getResponse().getProducts().getTotal());
+        responseEntity.getResponse().getProducts().getResults().forEach(result ->
+                    logger.info("Id: " + result.getId() + "Name: " + result.getMasterData().getCurrent().getName()));
+        logger.info("Total customers: " + responseEntity.getResponse().getCustomers().getTotal());
+        stub(projectKey, headers, logger);
+    }
+
+    static void stub(String projectKey, Map<String, String> headers, Logger logger) throws MalformedURLException {
+        GraphQLResponseEntity<ProductData> responseEntity =
+                new GraphQLTemplate()
+                        .query(
+                                GraphQLRequestEntity.Builder()
+                                        .url(ServiceRegion.GCP_EUROPE_WEST1.getApiUrl() + "/" + projectKey + "/graphql")
+                                        .headers(headers)
+                                        .request(ProductData.class)
+                                        .arguments(new Arguments("products",
+                                                new Argument("limit", 2),
+                                                new Argument("sort", "id desc")
+                                        ))
+                                        .build(),
+                                ProductData.class
+                        );
+        logger.info("Products Total: {}", responseEntity.getResponse().getTotal());
+
     }
 }

@@ -6,6 +6,8 @@ import com.commercetools.api.defaultconfig.ServiceRegion;
 import com.commercetools.importapi.defaultconfig.ImportApiRootBuilder;
 import io.vrap.rmf.base.client.AuthenticationToken;
 import io.vrap.rmf.base.client.HttpClientSupplier;
+import io.vrap.rmf.base.client.http.ErrorMiddleware;
+import io.vrap.rmf.base.client.http.OAuthMiddleware;
 import io.vrap.rmf.base.client.oauth2.ClientCredentials;
 import io.vrap.rmf.base.client.oauth2.ClientCredentialsTokenSupplier;
 
@@ -18,25 +20,48 @@ public class ClientService {
     public static ProjectApiRoot projectApiRoot;
     public static com.commercetools.importapi.client.ProjectApiRoot importApiRoot;
 
+    public static final String DEFAULT_PREFIX = "dev-mcz.";
+
     /**
      * @throws IOException exception
      */
     public static ProjectApiRoot createApiClient(final String prefix) throws IOException {
+        final Properties prop = new Properties();
+        prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
+        String clientId = prop.getProperty(prefix + "clientId");
+        String clientSecret = prop.getProperty(prefix + "clientSecret");
+        String projectKey = prop.getProperty(prefix + "projectKey");
 
-        projectApiRoot = null;
+        projectApiRoot = ApiRootBuilder.of()
+                .defaultClient(
+                        ClientCredentials.of()
+                                .withClientId(clientId)
+                                .withClientSecret(clientSecret)
+                                .build(),
+                        ServiceRegion.GCP_EUROPE_WEST1
+                )
+//                .withErrorMiddleware(ErrorMiddleware.of())
+//                .withOAuthMiddleware(OAuthMiddleware.of(..., ...))
+                .build(projectKey);
         return projectApiRoot;
     }
 
     public static String getProjectKey(final String prefix) throws IOException {
-        return null;
+        final Properties prop = new Properties();
+        prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
+        return prop.getProperty(prefix + "projectKey");
     }
 
     public static String getClientId(final String prefix) throws IOException {
-        return null;
+        final Properties prop = new Properties();
+        prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
+        return prop.getProperty(prefix + "clientId");
     }
 
     public static String getClientSecret(final String prefix) throws IOException {
-        return null;
+        final Properties prop = new Properties();
+        prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
+        return prop.getProperty(prefix + "clientSecret");
     }
 
     public static String getStoreKey(final String prefix) throws IOException {

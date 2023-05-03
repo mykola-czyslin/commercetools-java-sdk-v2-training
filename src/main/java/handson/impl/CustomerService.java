@@ -5,8 +5,12 @@ import com.commercetools.api.models.common.AddressBuilder;
 import com.commercetools.api.models.customer.*;
 
 import com.commercetools.api.models.customer_group.CustomerGroup;
+import com.commercetools.api.models.customer_group.CustomerGroupDraftBuilder;
 import com.commercetools.api.models.customer_group.CustomerGroupResourceIdentifierBuilder;
+import com.commercetools.api.models.type.CustomFieldsDraft;
+import com.commercetools.api.models.type.TypeResourceIdentifier;
 import io.vrap.rmf.base.client.ApiHttpResponse;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -22,7 +26,10 @@ public class CustomerService {
 
     public CompletableFuture<ApiHttpResponse<Customer>> getCustomerByKey(final String customerKey) {
         return
-                null;
+                this.apiRoot
+                        .customers()
+                        .withKey(customerKey)
+                        .get().execute();
     }
 
     public CompletableFuture<ApiHttpResponse<CustomerSignInResult>> createCustomer(
@@ -33,8 +40,22 @@ public class CustomerService {
             final String lastName,
             final String country) {
 
-        return
-                null;
+        return this.apiRoot.customers().post(
+                        CustomerDraft.builder()
+                                .email(email)
+                                .password(password)
+                                .key(customerKey)
+                                .firstName(firstName)
+                                .lastName(lastName)
+                                .addresses(
+                                        AddressBuilder.of()
+                                                .country(country)
+                                                .build()
+                                )
+                                .defaultShippingAddress(0)
+                                .build()
+                )
+                .execute();
     }
 
     public CompletableFuture<ApiHttpResponse<CustomerToken>> createEmailVerificationToken(
@@ -44,8 +65,10 @@ public class CustomerService {
 
         final Customer customer = customerSignInResultApiHttpResponse.getBody().getCustomer();
 
+//        CustomerCreateEmailToken.builder()
         return
-                null;
+//                this.apiRoot.customers().post()
+                this.createEmailVerificationToken(customer, timeToLiveInMinutes);
     }
 
     public CompletableFuture<ApiHttpResponse<CustomerToken>> createEmailVerificationToken(final Customer customer, final long timeToLiveInMinutes) {
@@ -58,7 +81,7 @@ public class CustomerService {
                                 CustomerCreateEmailTokenBuilder.of()
                                         .id(customer.getId())
                                         .ttlMinutes(timeToLiveInMinutes)
-                                .build()
+                                        .build()
                         )
                         .execute();
     }
@@ -68,7 +91,7 @@ public class CustomerService {
         final CustomerToken customerToken = customerTokenApiHttpResponse.getBody();
 
         return
-                null;
+                verifyEmail(customerToken);
     }
 
     public CompletableFuture<ApiHttpResponse<Customer>> verifyEmail(final CustomerToken customerToken) {
@@ -79,11 +102,23 @@ public class CustomerService {
                         .customers()
                         .emailConfirm()
                         .post(
-                               CustomerEmailVerifyBuilder.of()
-                                    .tokenValue(customerToken.getValue())
-                                    .build()
-                                )
+                                CustomerEmailVerifyBuilder.of()
+                                        .tokenValue(customerToken.getValue())
+                                        .build()
+                        )
                         .execute();
+    }
+
+    public CompletableFuture<ApiHttpResponse<CustomerGroup>> createGroup(String groupKey, String groupName) {
+        return apiRoot
+                .customerGroups()
+                .post(
+                        CustomerGroupDraftBuilder.of()
+                                .key(groupKey)
+                                .groupName(groupName)
+                                .build()
+                )
+                .execute();
     }
 
     public CompletableFuture<ApiHttpResponse<CustomerGroup>> getCustomerGroupByKey(final String customerGroupKey) {
@@ -106,16 +141,20 @@ public class CustomerService {
                 apiRoot
                         .customers()
                         .withKey(customer.getKey())
-                        .post(CustomerUpdateBuilder.of()
-                                .version(customer.getVersion())
-                                .actions(
-                                    CustomerSetCustomerGroupActionBuilder.of()
-                                        .customerGroup(CustomerGroupResourceIdentifierBuilder.of()
-                                                .key(customerGroup.getKey())
-                                                .build())
+                        .post(
+                                CustomerUpdateBuilder.of()
+                                        .version(customer.getVersion())
+                                        .actions(
+                                                CustomerSetCustomerGroupActionBuilder.of()
+                                                        .customerGroup(
+                                                                CustomerGroupResourceIdentifierBuilder.of()
+                                                                        .key(customerGroup.getKey())
+                                                                        .build()
+                                                        )
+                                                        .build()
+                                        )
                                         .build()
-                                )
-                                .build())
+                        )
                         .execute();
     }
 

@@ -35,8 +35,15 @@ public class Task02b_UPDATE_Group {
         //  GET a customer group
         //  ASSIGN the customer to the customer group
         //
-        logger.info("Customer assigned to group: " +
-                ""
+        logger.info("Customer assigned to group: {}" +
+                customerService.getCustomerByKey("mykola-chyslin")
+                        .thenCombineAsync(
+                                customerService.getCustomerGroupByKey("vip"),
+                                customerService::assignCustomerToCustomerGroup
+                        )
+                        .toCompletableFuture()
+                        .get()
+                        .get().getBody().getCustomerGroup()
         );
         client.close();
     }

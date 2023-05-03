@@ -25,7 +25,7 @@ public class Task03b_IMPORT_API {
         //  Provide a container key
         //
         final String apiImportClientPrefix = ApiPrefixHelper.API_DEV_IMPORT_PREFIX.getPrefix();
-        final String containerKey = "mh-berlin-store-prices";
+        final String containerKey = "mc-lviv-store-prices";
 
         Logger logger = LoggerFactory.getLogger(Task02b_UPDATE_Group.class.getName());
         final ProjectApiRoot client = createImportApiClient(apiImportClientPrefix);
@@ -37,18 +37,21 @@ public class Task03b_IMPORT_API {
         //  CREATE a price import request
         //  CHECK the status of your import requests
         //
-        logger.info("Created import container {} ",
-                importService.createImportContainer(containerKey)
-                        .toCompletableFuture().get()
-        );
+//        logger.info("Created import container {} ",
+//                importService.createImportContainer(containerKey)
+//                        .toCompletableFuture().get()
+//        );
 
         // TODO
-        Money amount = null;
+        Money amount = MoneyBuilder.of()
+                .currencyCode("UAH")
+                .centAmount(7899950L)
+                .build();
 
-        logger.info("Created price resource {} ",
-                importService.createPriceImportRequest(containerKey,"tulip-seed-product","TULIPSEED01", "TulipSeed01Price01", amount)
-                        .toCompletableFuture().get()
-        );
+//        logger.info("Created price resource {} ",
+//                importService.createPriceImportRequest(containerKey,"kamomille-tschysliensis","PALEKAMOMILLE", "PaleKamomillePrice01", amount)
+//                        .toCompletableFuture().get()
+//        );
 
         logger.info("Total containers in our project: {}",
                 client
