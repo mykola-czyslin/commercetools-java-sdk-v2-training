@@ -10,7 +10,11 @@ import com.commercetools.api.models.customer_group.CustomerGroupResourceIdentifi
 import com.commercetools.api.models.type.CustomFieldsDraft;
 import com.commercetools.api.models.type.TypeResourceIdentifier;
 import io.vrap.rmf.base.client.ApiHttpResponse;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -30,6 +34,11 @@ public class CustomerService {
                         .customers()
                         .withKey(customerKey)
                         .get().execute();
+    }
+
+    public CompletableFuture<ApiHttpResponse<CustomerPagedQueryResponse>> getCustomerByCustomerNumber(String customerNumber) {
+        String whereClause = "customerNumber=\"" + customerNumber + "\"";
+        return this.apiRoot.customers().get().withWhere(whereClause).execute();
     }
 
     public CompletableFuture<ApiHttpResponse<CustomerSignInResult>> createCustomer(

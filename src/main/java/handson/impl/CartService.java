@@ -49,23 +49,26 @@ public class CartService {
     public CompletableFuture<ApiHttpResponse<Cart>> createCart(final ApiHttpResponse<Customer> customerApiHttpResponse) {
 
         Customer customer = customerApiHttpResponse.getBody();
-        return
-                apiRoot
-                        .carts()
-                        .post(
-                                CartDraftBuilder.of()
-                                        .customerId(customer.getId())
-                                        .customerEmail(customer.getEmail())
-                                        .currency("UAH")
-                                        .country("UA")
-                                        .deleteDaysAfterLastModification(90L)
-                                        .shippingAddress(
-                                                customer.getAddresses().stream().findFirst().orElseThrow(IllegalStateException::new)
-                                        )
-                                         .inventoryMode(InventoryMode.RESERVE_ON_ORDER)
-                                        .build()
-                        )
-                        .execute();
+        return createCart(customer);
+    }
+
+    public CompletableFuture<ApiHttpResponse<Cart>> createCart(Customer customer) {
+        return apiRoot
+                .carts()
+                .post(
+                        CartDraftBuilder.of()
+                                .customerId(customer.getId())
+                                .customerEmail(customer.getEmail())
+                                .currency("UAH")
+                                .country("UA")
+                                .deleteDaysAfterLastModification(90L)
+                                .shippingAddress(
+                                        customer.getAddresses().stream().findFirst().orElseThrow(IllegalStateException::new)
+                                )
+                                .inventoryMode(InventoryMode.RESERVE_ON_ORDER)
+                                .build()
+                )
+                .execute();
     }
 
 
@@ -93,6 +96,10 @@ public class CartService {
 
         final Cart cart = cartApiHttpResponse.getBody();
 
+        return addProductToCart(cart, channel, skus);
+    }
+
+    public CompletableFuture<ApiHttpResponse<Cart>> addProductToCart(Cart cart, Channel channel, String... skus) {
         return apiRoot
                 .carts()
                 .withId(cart.getId())

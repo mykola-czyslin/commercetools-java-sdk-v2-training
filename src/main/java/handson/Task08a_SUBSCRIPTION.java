@@ -2,9 +2,7 @@ package handson;
 
 
 import com.commercetools.api.client.ProjectApiRoot;
-import com.commercetools.api.models.subscription.GoogleCloudPubSubDestinationBuilder;
-import com.commercetools.api.models.subscription.MessageSubscriptionBuilder;
-import com.commercetools.api.models.subscription.SubscriptionDraftBuilder;
+import com.commercetools.api.models.subscription.*;
 import handson.impl.ApiPrefixHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import static com.commercetools.api.models.subscription.MessageSubscriptionResourceTypeId.ORDER;
 import static handson.impl.ClientService.createApiClient;
 
 /**
@@ -26,6 +25,7 @@ public class Task08a_SUBSCRIPTION {
 
         final ProjectApiRoot client = createApiClient(apiClientPrefix);
         Logger logger = LoggerFactory.getLogger(Task08a_SUBSCRIPTION.class.getName());
+
 
         logger.info("Created subscription: " +
                 client
@@ -49,8 +49,14 @@ public class Task08a_SUBSCRIPTION {
                                         )
                                         .messages(
                                                 MessageSubscriptionBuilder.of()
-                                                        .resourceTypeId("order") // https://docs.commercetools.com/api/types#referencetype
+                                                        .resourceTypeId(ORDER) // https://docs.commercetools.com/api/types#referencetype
                                                         .types("OrderCreated") // https://docs.commercetools.com/api/message-types
+                                                        .build()
+                                        )
+                                        .changes(
+                                                ChangeSubscriptionBuilder.of()
+                                                        .resourceTypeId(ChangeSubscriptionResourceTypeId.ORDER)
+//                                                        .resourceTypeId(ChangeSubscriptionResourceTypeId.ORDER_EDIT)
                                                         .build()
                                         )
                                         .build()
@@ -59,6 +65,7 @@ public class Task08a_SUBSCRIPTION {
                         .toCompletableFuture().get()
                         .getBody()
         );
+
 
         client.close();
     }
